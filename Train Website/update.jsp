@@ -25,58 +25,47 @@
 			String password = request.getParameter("password");
 
 			//Make a SELECT query from the table specified by the 'command' parameter at the index.jsp
-			String str = "SELECT * FROM Employees where username = ?";
+			String str = "SELECT * FROM Employees where username = ? and ssn != ?";
 			stmt = con.prepareStatement(str);
 			//Run the query against the database.
 			stmt.setString(1, username);
+			stmt.setString(2, ssn);
 			ResultSet result = stmt.executeQuery();
-			
+
 			if (result.first()) { %>
 				<div class="container">
 					<div class="alert alert-warning">
-						An account with that username already exists. <a href="register.jsp">Back To Register</a> 
+						Another account with that username already exists. <a href="edit?ssn=<%= ssn %>">Back To Edit Form</a> 
 					</div>
 				</div>
 			<%
 			} else {
 				try {
-					String insert = "INSERT INTO Employees(ssn, first_name, last_name, username, password, isAdmin) ";
-					insert += "VALUES (?, ?, ?, ?, ?, 0)";
-					stmt = con.prepareStatement(insert);
+					String update = "UPDATE Employees set username = ?, first_name = ?, last_name = ?, password = ? WHERE ssn = ? ";
+					stmt = con.prepareStatement(update);
 					
-					stmt.setString(1, ssn);
+					stmt.setString(1, username);
 					stmt.setString(2, fname);
 					stmt.setString(3, lname);
-					stmt.setString(4, username);
-					stmt.setString(5, password);
+					stmt.setString(4, password);
+					stmt.setString(5, ssn);
 					
 					stmt.executeUpdate();
 					stmt.close();
 					
-					response.sendRedirect("employees.jsp");
-				} catch (Exception e) { 
-					if (e.toString().contains("Duplicate entry")) {
-
-						%> 
-						<div class="container">
-							<div class="alert alert-warning">
-								An account with this social security number exists. <a href="register.jsp">Back To Register</a> 
-							</div>
+					session.setAttribute("updatedEmployee", ssn);
+				 	response.sendRedirect("employees.jsp");
+				} catch (Exception e) {
+					out.print(e);
+					%>
+					<div class="container">
+						<div class="alert alert-warning">
+							Oops! Something went wrong. <a href="edit?ssn=<%= ssn %>">Back To Edit Form</a> 
 						</div>
-						<%
-					} else {
-						out.print(e);
-						%>
-						
-						<div class="container">
-							<div class="alert alert-warning">
-								Oops! Something went wrong. <a href="register.jsp">Back To Register</a> 
-							</div>
-						</div>
-						<%
-					}
+					</div>
+					<%
 				}
-			 }
+			}
 			result.close();
 			con.close();
 		%>
@@ -86,7 +75,7 @@
 			%>
 			<div class="container">
 				<div class="alert alert-warning">
-					Oops! Something went wrong. <a href="register.jsp">Back To Register</a> 
+					Oops! Something went wrong. <a href="employees.jsp">Back To Employees Page</a> 
 				</div>
 			</div>
 		<% } %>

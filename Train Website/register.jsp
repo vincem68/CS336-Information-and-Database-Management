@@ -3,16 +3,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-<%@ include file="head.jsp" %>
+<%@ include file="../head.jsp" %>
 </head>
 <body>
-	<% if (session.getAttribute("loggedIn") != null && (Boolean)session.getAttribute("loggedIn")) { 
-		response.sendRedirect("index.jsp"); 
-	} else { %>
+	<% if (session.getAttribute("loggedIn") == null || !((Boolean)session.getAttribute("loggedIn"))) {
+			response.sendRedirect("../login.jsp");
+	} else if (session.getAttribute("isAdmin") != null && (Integer)session.getAttribute("isAdmin") == 1) { %>
+	<%@ include file="../header.jsp" %>
+
 	<div class="container mx-auto" style="width: 800px;">
+		<br>
+		<div class="text-right">
+			<a href="employees.jsp">Manage Employees</a>
+		</div>
 		<div class="card">
 			<div class="card-body">
-			<h3 class="display-4 text-center">Create Account</h3>
+			<h3 class="display-4 text-center">Register Employee</h3>
 			<form action="registerPost.jsp" method="post">
 			  <div class="form-group">
 			  	<div class="form-row">
@@ -33,10 +39,10 @@
 			  	</div>
 			  </div>
 			  <div class="form-group">
-			    <label for="email">Email Address</label>
-			    <input type="text" name="email" class="form-control" id="emailInput" placeholder="Enter Username" required>
+			    <label for="ssn">Social Security</label>
+			    <input type="text" name="ssn" class="form-control" id="emailInput" placeholder="Enter SSN" required>
 			    <small class="form-text text-muted">
-			  		50 characters max.
+			  		11 characters max. Format ###-##-####
 			  	</small>
 			  </div>
 			  <div class="form-group">
@@ -55,19 +61,18 @@
 			  </div>
 			  <div class="form-group">
 			  	<input class="btn btn-success btn-lg btn-block" type="submit" value="Register">
-			  	<small class="form-text text-muted">
-			  		Have an account? <a href="login.jsp">Login</a>
-			  	</small>
 			  </div>
 			</form>	
 			</div>
 		</div>
-		<small class="text-right form-text text-muted">
-	  		<a href="employeeLogin.jsp"> Employee Login </a>
-	  	</small>
 	</div>
 	<%
-	}	
-	%>
+	} else { %>
+		<div class="container">
+			<div class="alert alert-warning">
+				You do not have permissions to view this page. <a href="../index.jsp">Home</a>
+			</div>
+		</div>
+	<% } %>
 </body>
 </html>
